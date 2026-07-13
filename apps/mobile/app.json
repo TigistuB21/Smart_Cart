@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Smart Cart",
+    "slug": "smart-cart",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
+    }
+  }
+}

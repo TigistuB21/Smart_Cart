@@ -1,0 +1,16 @@
+{
+  "name": "@smart-cart/notifications",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

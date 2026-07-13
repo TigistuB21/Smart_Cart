@@ -1,0 +1,159 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  email         String         @unique
+  displayName   String?        @map("display_name")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  shoppingLists ShoppingList[]
+  favorites     Favorite[]
+  reviews       Review[]
+  priceAlerts   PriceAlert[]
+
+  @@map("users")
+}
+
+model Store {
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String
+  chainName String         @map("chain_name")
+  address   String
+  zipCode   String         @map("zip_code")
+  location  Unsupported("geography(Point, 4326)")
+  createdAt DateTime       @default(now()) @map("created_at")
+  prices    Price[]
+  history   PriceHistory[]
+
+  @@map("stores")
+}
+
+model Category {
+  id       String     @id @default(uuid()) @db.Uuid
+  name     String     @unique
+  parentId String?    @map("parent_id") @db.Uuid
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@map("categories")
+}
+
+model Brand {
+  id       String    @id @default(uuid()) @db.Uuid
+  name     String    @unique
+  products Product[]
+
+  @@map("brands")
+}
+
+model Product {
+  id          String             @id @default(uuid()) @db.Uuid
+  upc         String             @unique
+  name        String
+  sizeVolume  String?            @map("size_volume")
+  categoryId  String?            @map("category_id") @db.Uuid
+  category    Category?          @relation(fields: [categoryId], references: [id])
+  brandId     String?            @map("brand_id") @db.Uuid
+  brand       Brand?             @relation(fields: [brandId], references: [id])
+  imageUrl    String?            @map("image_url")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  prices      Price[]
+  listItems   ShoppingListItem[]
+  favorites   Favorite[]
+  priceAlerts PriceAlert[]
+  history     PriceHistory[]
+
+  @@map("products")
+}
+
+model Price {
+  id        String   @id @default(uuid()) @db.Uuid
+  storeId   String   @map("store_id") @db.Uuid
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id") @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price     Decimal  @db.Decimal(10, 2)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([storeId, productId])
+  @@map("prices")
+}
+
+model PriceHistory {
+  time      DateTime @default(now())
+  storeId   String   @map("store_id") @db.Uuid
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id") @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price     Decimal  @db.Decimal(10, 2)
+
+  @@id([time, storeId, productId])
+  @@map("price_history")
+}
+
+model ShoppingList {
+  id        String             @id @default(uuid()) @db.Uuid
+  userId    String             @map("user_id") @db.Uuid
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime           @default(now()) @map("created_at")
+  items     ShoppingListItem[]
+
+  @@map("shopping_lists")
+}
+
+model ShoppingListItem {
+  id             String       @id @default(uuid()) @db.Uuid
+  shoppingListId String       @map("shopping_list_id") @db.Uuid
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  productId      String       @map("product_id") @db.Uuid
+  product        Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity       Int          @default(1)
+  addedAt        DateTime     @default(now()) @map("added_at")
+
+  @@unique([shoppingListId, productId])
+  @@map("shopping_list_items")
+}
+
+model Favorite {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id") @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  @@unique([userId, productId])
+  @@map("favorites")
+}
+
+model PriceAlert {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String   @map("product_id") @db.Uuid
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  targetPrice Decimal  @map("target_price") @db.Decimal(10, 2)
+  isTriggered Boolean  @default(false) @map("is_triggered")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("price_alerts")
+}
+
+model Review {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reviews")
+}
