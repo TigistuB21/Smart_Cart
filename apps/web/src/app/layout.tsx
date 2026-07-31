@@ -1,8 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
+import './globals.css';
 
 export const metadata = {
-  title: 'Smart Cart - Supermarket Price Comparison',
-  description: 'Compare grocery prices across multiple local stores in real-time.',
+  title: 'Smart Cart Ethiopia - Supermarket Price Comparison & Basket Optimizer',
+  description: 'Compare grocery prices across local stores in Addis Ababa and optimize your basket total in real-time.',
 };
 
 export default function RootLayout({
@@ -14,33 +16,64 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        <style>{`
-          body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            background-color: #0d1117;
-            color: #c9d1d9;
-          }
-        `}</style>
       </head>
-      <body>
-        <header style={{ borderBottom: '1px solid #21262d', padding: '1rem', backgroundColor: '#161b22' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#58a6ff' }}>Smart Cart</h1>
-            <nav>
-              <a href="/" style={{ color: '#c9d1d9', textDecoration: 'none', marginRight: '1rem' }}>Search</a>
-              <a href="/lists" style={{ color: '#c9d1d9', textDecoration: 'none' }}>My Lists</a>
+      <body className="min-h-screen flex flex-col bg-[#0b0f17] text-slate-200">
+        {/* Navigation Header */}
+        <header className="sticky top-0 z-50 backdrop-blur-md bg-[#111622]/90 border-b border-slate-800/80 px-4 py-3.5">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                SC
+              </div>
+              <div>
+                <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                  Smart Cart
+                </span>
+                <span className="ml-1.5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">
+                  Ethiopia
+                </span>
+              </div>
+            </Link>
+
+            <nav className="flex items-center gap-1.5 sm:gap-2">
+              <Link
+                href="/"
+                className="px-4 py-2 text-sm font-medium rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+              >
+                Search Products
+              </Link>
+              <Link
+                href="/basket"
+                className="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all shadow-sm"
+              >
+                Smart Basket
+              </Link>
             </nav>
           </div>
         </header>
-        <main style={{ maxWidth: '1200px', margin: '2rem auto', padding: '0 1rem' }}>
+
+        {/* Main Content Area */}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
           {children}
         </main>
-        <footer style={{ borderTop: '1px solid #21262d', padding: '1rem', textAlign: 'center', marginTop: '4rem', fontSize: '0.9rem', color: '#8b949e' }}>
-          &copy; {new Date().getFullYear()} Smart Cart Platform. All rights reserved.
+
+        {/* Footer */}
+        <footer className="border-t border-slate-800/60 py-6 text-center text-xs text-slate-500">
+          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p>&copy; {new Date().getFullYear()} Smart Cart Ethiopia (Portfolio Edition). Real-time Price Intelligence.</p>
+            <div className="flex items-center gap-4 text-slate-400 font-medium">
+              <span>Shoa Supermarket</span>
+              <span>•</span>
+              <span>Merkato</span>
+              <span>•</span>
+              <span>Bambis</span>
+              <span>•</span>
+              <span>FreshMart</span>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
