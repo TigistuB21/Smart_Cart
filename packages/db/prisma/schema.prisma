@@ -14,8 +14,6 @@ model User {
   createdAt     DateTime       @default(now()) @map("created_at")
   shoppingLists ShoppingList[]
   favorites     Favorite[]
-  reviews       Review[]
-  priceAlerts   PriceAlert[]
 
   @@map("users")
 }
@@ -24,9 +22,10 @@ model Store {
   id        String         @id @default(uuid()) @db.Uuid
   name      String
   chainName String         @map("chain_name")
+  city      String         @default("Addis Ababa")
   address   String
-  zipCode   String         @map("zip_code")
-  location  Unsupported("geography(Point, 4326)")
+  latitude  Float?
+  longitude Float?
   createdAt DateTime       @default(now()) @map("created_at")
   prices    Price[]
   history   PriceHistory[]
@@ -55,8 +54,10 @@ model Brand {
 
 model Product {
   id          String             @id @default(uuid()) @db.Uuid
-  upc         String             @unique
+  upc         String?            @unique
   name        String
+  nameAmharic String?            @map("name_amharic")
+  unit        String             @default("Kg")
   sizeVolume  String?            @map("size_volume")
   categoryId  String?            @map("category_id") @db.Uuid
   category    Category?          @relation(fields: [categoryId], references: [id])
@@ -67,7 +68,6 @@ model Product {
   prices      Price[]
   listItems   ShoppingListItem[]
   favorites   Favorite[]
-  priceAlerts PriceAlert[]
   history     PriceHistory[]
 
   @@map("products")
@@ -132,28 +132,4 @@ model Favorite {
 
   @@unique([userId, productId])
   @@map("favorites")
-}
-
-model PriceAlert {
-  id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId   String   @map("product_id") @db.Uuid
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  targetPrice Decimal  @map("target_price") @db.Decimal(10, 2)
-  isTriggered Boolean  @default(false) @map("is_triggered")
-  createdAt   DateTime @default(now()) @map("created_at")
-
-  @@map("price_alerts")
-}
-
-model Review {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("reviews")
 }
