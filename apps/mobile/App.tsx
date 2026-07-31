@@ -1,88 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import ScannerScreen from './src/screens/ScannerScreen';
 
 export default function App() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
-  const [activeTab, setActiveTab] = useState<'search' | 'list'>('search');
-
-  useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-
-    getBarCodeScannerPermissions();
-  }, []);
-
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-  };
+  const [activeTab, setActiveTab] = useState<'scanner' | 'basket'>('scanner');
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header bar */}
+      <StatusBar barStyle="light-content" backgroundColor="#0b0f17" />
+
+      {/* App Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Smart Cart</Text>
+        <View style={styles.headerTitleRow}>
+          <View style={styles.logoBox}>
+            <Text style={styles.logoText}>SC</Text>
+          </View>
+          <Text style={styles.headerTitle}>Smart Cart</Text>
+          <View style={styles.ethiopiaPill}>
+            <Text style={styles.ethiopiaPillText}>🇪🇹 ETHIOPIA</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Main content body */}
-      {activeTab === 'search' ? (
-        <View style={styles.tabContent}>
-          {hasPermission === null ? (
-            <Text style={styles.text}>Requesting camera permission...</Text>
-          ) : hasPermission === false ? (
-            <Text style={styles.text}>No access to camera. Enable camera to scan barcodes.</Text>
-          ) : (
-            <View style={styles.scannerContainer}>
-              <BarCodeScanner
-                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                style={StyleSheet.absoluteFillObject}
-              />
-              {scanned && (
-                <TouchableOpacity style={styles.scanButton} onPress={() => setScanned(false)}>
-                  <Text style={styles.scanButtonText}>Tap to Scan Again</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-          <Text style={styles.tipText}>Point camera at a product barcode to compare prices</Text>
-        </View>
-      ) : (
-        <ScrollView style={styles.listContainer}>
-          <Text style={styles.sectionTitle}>Active Shopping List</Text>
-          <View style={styles.listItem}>
-            <View>
-              <Text style={styles.itemTitle}>Organic Whole Milk</Text>
-              <Text style={styles.itemSubtitle}>FreshField • 1 Gallon</Text>
-            </View>
-            <Text style={styles.itemPrice}>$4.49</Text>
-          </View>
-          <View style={styles.listItem}>
-            <View>
-              <Text style={styles.itemTitle}>Creamy Peanut Butter</Text>
-              <Text style={styles.itemSubtitle}>NuttyDelight • 18 oz</Text>
-            </View>
-            <Text style={styles.itemPrice}>$3.29</Text>
-          </View>
-        </ScrollView>
-      )}
+      {/* Screen Body */}
+      <View style={styles.body}>
+        {activeTab === 'scanner' ? (
+          <ScannerScreen />
+        ) : (
+          <ScrollView style={styles.basketScroll} contentContainerStyle={styles.basketContent}>
+            <Text style={styles.sectionHeader}>Addis Ababa Sample Basket</Text>
 
-      {/* Navigation tabs */}
-      <View style={styles.navTabs}>
+            <View style={styles.basketCard}>
+              <Text style={styles.itemTitle}>White Teff (ነጭ ጤፍ)</Text>
+              <Text style={styles.itemSub}>2 Kg • Cheapest at Merkato (110 ETB/Kg)</Text>
+              <Text style={styles.itemCost}>220.00 ETB</Text>
+            </View>
+
+            <View style={styles.basketCard}>
+              <Text style={styles.itemTitle}>Fresh Milk (ትኩስ ወተት)</Text>
+              <Text style={styles.itemSub}>3 L • Cheapest at Merkato (55 ETB/L)</Text>
+              <Text style={styles.itemCost}>165.00 ETB</Text>
+            </View>
+
+            <View style={styles.basketCard}>
+              <Text style={styles.itemTitle}>Barilla Spaghetti (ባሪላ ፓስታ)</Text>
+              <Text style={styles.itemSub}>2 Packs • Cheapest at Merkato (85 ETB/Pack)</Text>
+              <Text style={styles.itemCost}>170.00 ETB</Text>
+            </View>
+
+            <View style={styles.summaryBox}>
+              <Text style={styles.summaryTitle}>SPLIT-BASKET OPTIMAL TOTAL</Text>
+              <Text style={styles.summaryAmount}>555.00 ETB</Text>
+              <Text style={styles.summarySavings}>Saving 85.00 ETB vs Shoa Supermarket</Text>
+            </View>
+          </ScrollView>
+        )}
+      </View>
+
+      {/* Bottom Tab Bar */}
+      <View style={styles.tabBar}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'search' && styles.activeTab]}
-          onPress={() => setActiveTab('search')}
+          style={[styles.tabItem, activeTab === 'scanner' && styles.activeTabItem]}
+          onPress={() => setActiveTab('scanner')}
         >
-          <Text style={[styles.tabText, activeTab === 'search' && styles.activeTabText]}>Scanner / Search</Text>
+          <Text style={[styles.tabIcon, activeTab === 'scanner' && styles.activeTabIcon]}>📷</Text>
+          <Text style={[styles.tabLabel, activeTab === 'scanner' && styles.activeTabLabel]}>
+            Barcode Scanner
+          </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'list' && styles.activeTab]}
-          onPress={() => setActiveTab('list')}
+          style={[styles.tabItem, activeTab === 'basket' && styles.activeTabItem]}
+          onPress={() => setActiveTab('basket')}
         >
-          <Text style={[styles.tabText, activeTab === 'list' && styles.activeTabText]}>Shopping List</Text>
+          <Text style={[styles.tabIcon, activeTab === 'basket' && styles.activeTabIcon]}>🛒</Text>
+          <Text style={[styles.tabLabel, activeTab === 'basket' && styles.activeTabLabel]}>
+            Addis Basket
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -92,118 +86,147 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0d1117',
+    backgroundColor: '#0b0f17',
   },
   header: {
-    paddingHeight: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#111622',
     borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
-    backgroundColor: '#161b22',
-    paddingVertical: 15,
+    borderBottomColor: '#1e293b',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logoBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#10b981',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoText: {
+    color: '#022c22',
+    fontWeight: '900',
+    fontSize: 14,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#58a6ff',
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#f8fafc',
   },
-  tabContent: {
+  ethiopiaPill: {
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderWidth: 1,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+  },
+  ethiopiaPillText: {
+    color: '#34d399',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  body: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
   },
-  scannerContainer: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#30363d',
-    position: 'relative',
-    marginBottom: 20,
-  },
-  scanButton: {
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: '#238636',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 6,
-  },
-  scanButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  text: {
-    color: '#c9d1d9',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  tipText: {
-    color: '#8b949e',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  listContainer: {
+  basketScroll: {
     flex: 1,
-    padding: 20,
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#bc8cff',
-    marginBottom: 15,
+  basketContent: {
+    padding: 16,
   },
-  listItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#f8fafc',
+    marginBottom: 16,
+  },
+  basketCard: {
+    backgroundColor: '#111622',
+    borderColor: '#1e293b',
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
   },
   itemTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#c9d1d9',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#f8fafc',
   },
-  itemSubtitle: {
-    fontSize: 14,
-    color: '#8b949e',
+  itemSub: {
+    fontSize: 12,
+    color: '#94a3b8',
     marginTop: 2,
   },
-  itemPrice: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#39d353',
+  itemCost: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#34d399',
+    marginTop: 6,
   },
-  navTabs: {
-    flexDirection: 'row',
-    height: 60,
-    borderTopWidth: 1,
-    borderTopColor: '#21262d',
-    backgroundColor: '#161b22',
-  },
-  tab: {
-    flex: 1,
-    justifyContent: 'center',
+  summaryBox: {
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderWidth: 1.5,
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 10,
     alignItems: 'center',
   },
-  activeTab: {
-    borderTopWidth: 2,
-    borderTopColor: '#58a6ff',
+  summaryTitle: {
+    color: '#10b981',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
-  tabText: {
-    fontSize: 14,
-    color: '#8b949e',
+  summaryAmount: {
+    color: '#34d399',
+    fontSize: 28,
+    fontWeight: '900',
+    marginVertical: 4,
   },
-  activeTabText: {
-    color: '#58a6ff',
+  summarySavings: {
+    color: '#cbd5e1',
+    fontSize: 12,
     fontWeight: '600',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#111622',
+    borderTopWidth: 1,
+    borderTopColor: '#1e293b',
+    height: 60,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTabItem: {
+    borderTopWidth: 2,
+    borderTopColor: '#10b981',
+  },
+  tabIcon: {
+    fontSize: 18,
+    marginBottom: 2,
+    opacity: 0.6,
+  },
+  activeTabIcon: {
+    opacity: 1,
+  },
+  tabLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  activeTabLabel: {
+    color: '#10b981',
+    fontWeight: '700',
   },
 });
