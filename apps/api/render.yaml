@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: smart-cart-api
+    env: node
+    region: oregon
+    buildCommand: pnpm install && pnpm --filter @smart-cart/db build && pnpm --filter @smart-cart/api build
+    startCommand: node apps/api/dist/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000

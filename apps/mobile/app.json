@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.smartcart.ethiopia",
       "permissions": [
         "android.permission.CAMERA"
       ]
